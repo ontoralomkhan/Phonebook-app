@@ -1,0 +1,189 @@
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <string>
+#include <cctype>
+using namespace std;
+
+struct Contact {
+    string name;
+    string phone;
+};
+
+string toLowerCase(string s) {
+    for (char &c : s) {
+        c = tolower(c);
+    }
+    return s;
+}
+
+void sortContacts(vector<Contact> &contacts) {
+    int n = contacts.size();
+
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (toLowerCase(contacts[j].name) >
+                toLowerCase(contacts[j + 1].name)) {
+                swap(contacts[j], contacts[j + 1]);
+            }
+        }
+    }
+}
+
+int binarySearch(vector<Contact> &contacts, string key) {
+    int low = 0;
+    int high = contacts.size() - 1;
+
+    key = toLowerCase(key);
+
+    while (low <= high) {
+        int mid = low + (high - low) / 2;
+
+        string current = toLowerCase(contacts[mid].name);
+
+        if (current == key)
+            return mid;
+
+        if (current < key)
+            low = mid + 1;
+        else
+            high = mid - 1;
+    }
+
+    return -1;
+}
+
+void addContact(vector<Contact> &contacts) {
+    Contact c;
+
+    cout << "Enter Name: ";
+    getline(cin >> ws, c.name);
+
+    if (binarySearch(contacts, c.name) != -1) {
+        cout << "Contact already exists!\n";
+        return;
+    }
+
+    cout << "Enter Phone Number: ";
+    getline(cin, c.phone);
+
+    contacts.push_back(c);
+    sortContacts(contacts);
+
+    cout << "Contact added successfully!\n";
+}
+
+void displayContacts(vector<Contact> &contacts) {
+    if (contacts.empty()) {
+        cout << "Phonebook is empty!\n";
+        return;
+    }
+
+    sortContacts(contacts);
+
+    cout << "\n--- Contact List ---\n";
+
+    for (int i = 0; i < contacts.size(); i++) {
+        cout << i + 1 << ". "
+             << contacts[i].name
+             << " - " << contacts[i].phone << "\n";
+    }
+}
+
+void searchContact(vector<Contact> &contacts) {
+    if (contacts.empty()) {
+        cout << "Phonebook is empty!\n";
+        return;
+    }
+
+    sortContacts(contacts);
+
+    string name;
+    cout << "Enter Name to Search: ";
+    getline(cin >> ws, name);
+
+    int result = binarySearch(contacts, name);
+
+    if (result != -1) {
+        cout << "Contact Found!\n";
+        cout << "Name: " << contacts[result].name << "\n";
+        cout << "Phone: " << contacts[result].phone << "\n";
+    } else {
+        cout << "Contact Not Found!\n";
+    }
+}
+
+void deleteContact(vector<Contact> &contacts) {
+    if (contacts.empty()) {
+        cout << "Phonebook is empty!\n";
+        return;
+    }
+
+    sortContacts(contacts);
+
+    string name;
+    cout << "Enter Name to Delete: ";
+    getline(cin >> ws, name);
+
+    int result = binarySearch(contacts, name);
+
+    if (result != -1) {
+        contacts.erase(contacts.begin() + result);
+        cout << "Contact deleted successfully!\n";
+    } else {
+        cout << "Contact Not Found!\n";
+    }
+}
+
+int main() {
+    vector<Contact> contacts;
+    int choice;
+
+    do {
+        cout << "\n===== PHONEBOOK MANAGEMENT SYSTEM =====\n";
+        cout << "1. Add Contact\n";
+        cout << "2. Display Contacts\n";
+        cout << "3. Search Contact\n";
+        cout << "4. Delete Contact\n";
+        cout << "5. Sort Contacts\n";
+        cout << "6. Exit\n";
+
+        cout << "Enter Your Choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                addContact(contacts);
+                break;
+
+            case 2:
+                displayContacts(contacts);
+                break;
+
+            case 3:
+                searchContact(contacts);
+                break;
+
+            case 4:
+                deleteContact(contacts);
+                break;
+
+            case 5:
+                sortContacts(contacts);
+                cout << "Contacts sorted successfully!\n";
+                break;
+
+            case 6:
+                cout << "Thank you for using Phonebook!\n";
+                break;
+
+            default:
+                cout << "Invalid Choice! Try Again.\n";
+        }
+
+    } while (choice != 6);
+
+    return 0;
+}
+
